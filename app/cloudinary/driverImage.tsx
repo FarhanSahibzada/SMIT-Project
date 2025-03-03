@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import globalStyle from "@/constant/constant";
-import PickerImage from "./pickerImage";
+import PickerImage from "../../components/pickerImage";
+import { globalContext } from "@/context/globalContext";
 
 function DriverImage() {
+  const {profileImage, vehicleImage, setProfileImage, setVehicleImage}= useContext(globalContext)
+
   
-  const [profileImage, setProfileImage] = useState();
-  const [vehicleImage, setVehicleImage] = useState();
 
 const pickProfileImage = async () => {
   let result = await ImagePicker.launchImageLibraryAsync({
@@ -108,13 +109,9 @@ const uploadImageToCloudinaryV = async (image: any) => {
   return (
     <View>
       <PickerImage onPress={pickProfileImage} text="Profile Image"/>
-      {profileImage && (
-        <Image source={{ uri: profileImage }} style={globalStyle.image} />
-      )}
+      {profileImage && <Image source={{ uri: profileImage || "" }} style={globalStyle.image} />}
       <PickerImage onPress={pickVehicleImage} text="Pick Vehicle Image"/>
-      {vehicleImage  && (
-        <Image source={{ uri: vehicleImage  }} style={globalStyle.image} />
-      )}
+      {vehicleImage  && <Image source={{ uri: vehicleImage || ""  }} style={globalStyle.image} />}
     </View>
   )
 };

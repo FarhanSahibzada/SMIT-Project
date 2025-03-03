@@ -1,11 +1,16 @@
-import { router } from "expo-router";
-import React, { useState } from "react";
+import { router, useRouter } from "expo-router";
+import React, { useContext, useState } from "react";
 import GreenButton from "../components/greenButton";
-import { View, Text, TextInput, StyleSheet, Image, ScrollView } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { View, Text, TextInput, StyleSheet, Image, ScrollView, Alert } from "react-native";
 import globalStyle, { AppRoutes } from "@/constant/constant";
 import axios from "axios"
+import { AuthContext } from "@/context/authContext";
+import RoleBasedNavigation from "@/components/roleBasedNavigation";
 
 function Index() {
+  const { user } = useContext(AuthContext)
+  const router = useRouter()
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -16,31 +21,35 @@ function Index() {
   };
 
   const handleSubmit = async () => {
-    console.log("Form Data:", formData);
     const obj = {
       email : formData.email,
       password : formData.password
     }
     try {
       const response = await axios.post(AppRoutes.login, obj)
-      console.log("res", response);
+      const data = response?.data?.data
+      console.log(data);
+      AsyncStorage.setItem("token", data?.token)
+      if(data?.user?.role === "driver"){
+        return router.push("/pages/driverdashboard")
+      }  
+      else if(data?.user?.role === "user"){
+        return router.push("/pages/userdashboard")
+      } else{
+        return router.push("/")
+      }
     } catch (error) {
-      console.log("error", error);
-      
+      console.log("error==>", error);
     }
-
-function Index() {
-  const { control, handleSubmit } = useForm<form_Data>()
-
-  const Submit = (formData: form_Data) => {
-    console.log('Form Data:', formData)
   };
 
   return (
+    <>
+    {user ? <RoleBasedNavigation/> : 
     <ScrollView style={globalStyle.container}>
       <Image
-        source={require("../assets/images/carpool.png")}
         style={styles.logo}
+        source={require("../assets/images/carpool.png")}
       />
       <Text style={styles.title}>Welcome To Carpool</Text>
       <Text style={styles.description}>
@@ -75,6 +84,8 @@ function Index() {
         </Text>
       </Text>
     </ScrollView>
+     } 
+    </>
   );
 }
 

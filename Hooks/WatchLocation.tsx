@@ -23,8 +23,8 @@ export default async function WatchLocation() {
                 if (lastSentLocation) {
                     const distance = getDistance(lastSentLocation, newLocation);
                     console.log("distance ", distance)
-                    if (distance < 100) {
-                        return []
+                    if (distance < 15) {
+                        return 
                     }
                 }
 
